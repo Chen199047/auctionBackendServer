@@ -1,0 +1,20 @@
+{
+  "name": "auctionbackend",
+  "version": "1.0.0",
+  "description": "my auction web backend",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "auction"
+  ],
+  "author": "Xiaotian Chen",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "convict": "^4.3.1",
+    "express": "^4.16.3",
+    "mysql": "^2.15.0"
+  }
+}
