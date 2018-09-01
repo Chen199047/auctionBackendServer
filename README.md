@@ -1,2 +1,2 @@
 # AuctionBackendServer
-An auction web backend server base on node
+An auction web backend server based on node
