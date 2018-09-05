@@ -71,7 +71,9 @@ exports.login = function(req,res){
         "user_password" : req.query.password
     };
     let token = myMiddleware.creatToken(user_data);
-    //console.log(user_data.user_username);
+    //console.log(user_data);
+    //console.log(req.params.username);
+    //console.log(req.body.username);
     User.loginUser(user_data, token, function (result) {
         /*res.json({
             error:false,

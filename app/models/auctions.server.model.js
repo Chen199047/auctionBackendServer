@@ -18,7 +18,7 @@ exports.getAuctions = function(options,done){
         let sql = "select auction_id as id,category_title as categoryTitle,auction_categoryid as categoryId,auction_title as title," +
             "auction_reserveprice as reservePrice,auction_startingdate as startDateTime,auction_endingdate as " +
             "endDateTime,max(bid_amount) as currentBid From (auction a LEFT JOIN category c ON a.auction_categoryid = c.category_id) LEFT JOIN" +
-            " bid b ON a.auction_id = b.bid_auctionid WHERE auction_userid = ? "
+            " bid b ON a.auction_id = b.bid_auctionid WHERE auction_userid = ? GROUP BY id"
         db.get_pool().query(sql,[options.seller],function (err,result1) {
             if(err) return done(1);
             done(result1);
@@ -29,7 +29,7 @@ exports.getAuctions = function(options,done){
         let sql1 = "select auction_id as id,category_title as categoryTitle,auction_categoryid as categoryId,auction_title as title," +
             "auction_reserveprice as reservePrice,auction_startingdate as startDateTime,auction_endingdate as " +
             "endDateTime,max(bid_amount) as currentBid From (auction a LEFT JOIN category c ON a.auction_categoryid = c.category_id) LEFT JOIN" +
-            " bid b ON a.auction_id = b.bid_auctionid WHERE bid_id = ? "
+            " bid b ON a.auction_id = b.bid_auctionid WHERE bid_id = ? GROUP BY id"
         db.get_pool().query(sql1,[options.bidder],function (err,result2) {
             if(err) return done(1);
             done(result2);
@@ -41,18 +41,19 @@ exports.getAuctions = function(options,done){
         let sql2 = "select auction_id as id,category_title as categoryTitle,auction_categoryid as categoryId,auction_title as title," +
             "auction_reserveprice as reservePrice,auction_startingdate as startDateTime,auction_endingdate as " +
             "endDateTime,max(bid_amount) as currentBid From ((auction a LEFT JOIN category c ON a.auction_categoryid = c.category_id) LEFT JOIN" +
-            " bid b ON a.auction_id = b.bid_auctionid) left join auction_user on b.bid_userid = auction_user.user_id WHERE user_id = ? and bid_amount >= auction_reserveprice; "
+            " bid b ON a.auction_id = b.bid_auctionid) left join auction_user on b.bid_userid = auction_user.user_id WHERE user_id = ? and bid_amount >= auction_reserveprice GROUP BY id; "
         db.get_pool().query(sql2,[options.winner],function (err,result3) {
             if(err) return done(1);
             done(result3);
         })
     }
     else if(options.q != null){
+        console.log(options.q);
         let sql3 = "SELECT auction_id as id,category_title as categoryTitle,auction_categoryid as categoryId,auction_title as title," +
             "auction_reserveprice as reservePrice,auction_startingdate as startDateTime,auction_endingdate as endDateTime," +
             "max(bid_amount) as currentBid From (auction a LEFT JOIN category c ON a.auction_categoryid = c.category_id) LEFT JOIN bid b ON a.auction_id" +
             "= b.bid_auctionid " +
-            "WHERE auction_id >= ? and auction_id < ? and auction_title like ?;"
+            "WHERE auction_id >= ? and auction_id < ? and auction_title like ? GROUP BY id;"
         db.get_pool().query(sql3,[options.startIndex,options.count,'%'+options.q+'%'],function(err,result4){
             if (err) return done(1);
             //console.log(result4);
@@ -63,6 +64,7 @@ exports.getAuctions = function(options,done){
     }
 
     else if (options.category_id != null) {
+        console.log(options.category_id);
         let sql4 = "SELECT auction_id as id,category_title as categoryTitle,auction_categoryid as categoryId,auction_title as title," +
             "auction_reserveprice as reservePrice,auction_startingdate as startDateTime,auction_endingdate as endDateTime," +
             "max(bid_amount) as currentBid From (auction a LEFT JOIN category c ON a.auction_categoryid = c.category_id) LEFT JOIN bid b ON a.auction_id" +
@@ -113,6 +115,7 @@ exports.createAuctions = function (auction_data,token,done) {
     let user_token = token.toString();
 
 
+
     let sql_selectUid = "SELECT user_id FROM auction_user WHERE user_token = ?";
 
     db.get_pool().query(sql_selectUid,[user_token],function (err,result) {
@@ -124,9 +127,13 @@ exports.createAuctions = function (auction_data,token,done) {
             // console.log(user_id);
             let dt = dateTime.create();
             let formated = dt.format('y-m-d H:M:S');
-            //console.log(formated);
+            let startDateTime = new Date(parseInt(auction_data.startDateTime));
+            let endDateTime = new Date(parseInt(auction_data.endDateTime));
+            //let auction_start = auction_data.startDateTime.format('y-m-d H:M:S');
 
-            let values = [[auction_data.categoryId,auction_data.title,auction_data.description,auction_data.startDateTime,auction_data.endDateTime,
+
+
+            let values = [[auction_data.categoryId,auction_data.title,auction_data.description,startDateTime,endDateTime,
                 auction_data.reservePrice,auction_data.startingBid,user_id,formated]];
 
             let sql_insertAuction = "INSERT INTO auction (auction_categoryid,auction_title,auction_description,auction_startingdate,auction_endingdate," +

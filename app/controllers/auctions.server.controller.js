@@ -166,6 +166,7 @@ exports.getPhoto = function (req,res) {
                         // Not found JPEG or PNG
                         fs.stat(default_path, function(err, stat){
                             if (err){
+                                //console.log(default_path);
                                 // There is a problem
                                 res.sendStatus(500);
                             }else{
