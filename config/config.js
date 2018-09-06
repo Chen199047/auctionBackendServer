@@ -1,4 +1,5 @@
 const convict = require('convict');
+//use your database 
 
 let config = convict({
     authToken: {
@@ -8,7 +9,7 @@ let config = convict({
     db: {
         host: { // host, rather than hostname, as mysql connection string uses 'host'
             format: String,
-            default: "13.211.77.143"
+            default: "XXXXXXX"
         },
         port:{
             format: Number,
@@ -17,11 +18,11 @@ let config = convict({
         },
         user: {
             format: String,
-            default: 'xch75'
+            default: 'XXXX'
         },
         password: {
             format: String,
-            default: '31933301'
+            default: 'XXXXXX'
         },
         database: {
             format: String,
